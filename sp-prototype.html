@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SwiftPay — High-Fidelity Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#10151B;
+    --panel:#171F27;
+    --panel-2:#1D2733;
+    --brass:#C79A45;
+    --brass-dim: rgba(199,154,69,0.16);
+    --mint:#4ADE9B;
+    --coral:#E2725B;
+    --text:#F4F1EA;
+    --muted:#8D97A3;
+    --hair: rgba(244,241,234,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: radial-gradient(circle at 30% 0%, #1a222c 0%, #0b0f14 65%);
+    font-family:'Inter',sans-serif;
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:40px 16px 60px;
+  }
+  .intro{
+    max-width:420px;
+    text-align:center;
+    margin-bottom:28px;
+  }
+  .intro .eyebrow{
+    color:var(--brass);
+    font-size:13px;
+    letter-spacing:0.02em;
+    margin-bottom:8px;
+  }
+  .intro h1{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:28px;
+    margin:0 0 8px;
+    line-height:1.2;
+  }
+  .intro p{
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.5;
+    margin:0;
+  }
+  .tabs{
+    display:flex;
+    gap:6px;
+    background:var(--panel);
+    border:1px solid var(--hair);
+    border-radius:999px;
+    padding:4px;
+    margin-bottom:28px;
+  }
+  .tabs button{
+    border:none;
+    background:transparent;
+    color:var(--muted);
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    font-weight:600;
+    padding:9px 18px;
+    border-radius:999px;
+    cursor:pointer;
+    transition: background .25s ease, color .25s ease;
+  }
+  .tabs button.active{
+    background:var(--brass);
+    color:#1A140A;
+  }
+  .phone{
+    width:360px;
+    height:740px;
+    background:var(--ink);
+    border-radius:44px;
+    border:8px solid #05070A;
+    box-shadow: 0 40px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.03);
+    overflow:hidden;
+    position:relative;
+  }
+  .notch{
+    position:absolute;
+    top:0; left:50%;
+    transform:translateX(-50%);
+    width:130px; height:26px;
+    background:#05070A;
+    border-radius:0 0 16px 16px;
+    z-index:5;
+  }
+  .screen{
+    position:absolute;
+    inset:0;
+    padding:46px 22px 24px;
+    display:none;
+    flex-direction:column;
+    animation: fade .3s ease;
+  }
+  .screen.active{ display:flex; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  /* ---- LOGIN ---- */
+  .login-mark{
+    display:flex; align-items:center; gap:8px;
+    margin-bottom:34px;
+  }
+  .login-mark .dot{
+    width:10px;height:10px;border-radius:50%;
+    background:var(--brass);
+  }
+  .login-mark span{
+    font-family:'Fraunces',serif;
+    font-size:18px; letter-spacing:0.01em;
+  }
+  .login-head h2{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:24px;
+    margin:0 0 6px;
+    line-height:1.25;
+  }
+  .login-head p{
+    color:var(--muted);
+    font-size:13.5px;
+    margin:0 0 26px;
+    line-height:1.5;
+  }
+  .field{
+    background:var(--panel);
+    border:1px solid var(--hair);
+    border-radius:12px;
+    padding:13px 14px;
+    margin-bottom:12px;
+  }
+  .field label{
+    display:block;
+    font-size:11px;
+    color:var(--muted);
+    margin-bottom:4px;
+  }
+  .field input{
+    background:transparent;
+    border:none;
+    color:var(--text);
+    font-size:14.5px;
+    width:100%;
+    outline:none;
+    font-family:'Inter',sans-serif;
+  }
+  .btn-primary{
+    background:var(--brass);
+    color:#1A140A;
+    border:none;
+    border-radius:12px;
+    padding:14px;
+    font-weight:700;
+    font-size:14.5px;
+    cursor:pointer;
+    margin-top:10px;
+  }
+  .btn-ghost{
+    background:transparent;
+    border:1px solid var(--hair);
+    color:var(--text);
+    border-radius:12px;
+    padding:13px;
+    font-weight:600;
+    font-size:14px;
+    margin-top:10px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .trust-strip{
+    margin-top:auto;
+    border-top:1px solid var(--hair);
+    padding-top:16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .trust-row{
+    display:flex; align-items:center; gap:10px;
+    font-size:12px; color:var(--muted);
+  }
+  .trust-row svg{ flex-shrink:0; }
+  .trust-row b{ color:var(--text); font-weight:600; }
+
+  /* ---- HOME ---- */
+  .home-top{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    margin-bottom:22px;
+  }
+  .greeting{ font-size:12.5px; color:var(--muted); margin-bottom:2px; }
+  .name{ font-size:16px; font-weight:600; }
+  .avatar{
+    width:36px;height:36px;border-radius:50%;
+    background:var(--panel-2);
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px; font-weight:700; color:var(--brass);
+    border:1px solid var(--hair);
+  }
+  .balance-card{
+    background: linear-gradient(155deg, #1D2733 0%, #141B22 100%);
+    border:1px solid var(--hair);
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:18px;
+  }
+  .balance-label{
+    font-size:12px; color:var(--muted); margin-bottom:6px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .verified-pill{
+    background:var(--brass-dim); color:var(--brass);
+    font-size:10.5px; font-weight:700;
+    padding:2px 8px; border-radius:999px;
+    display:inline-flex; align-items:center; gap:4px;
+  }
+  .balance-amount{
+    font-family:'Fraunces',serif;
+    font-size:34px; font-weight:500;
+    margin-bottom:14px;
+  }
+  .balance-actions{ display:flex; gap:8px; }
+  .chip{
+    flex:1;
+    background:rgba(244,241,234,0.06);
+    border:1px solid var(--hair);
+    border-radius:10px;
+    padding:9px 0;
+    text-align:center;
+    font-size:12.5px; font-weight:600;
+  }
+  .section-label{
+    font-size:12.5px; font-weight:600; color:var(--muted);
+    margin:4px 0 10px;
+  }
+  .tx-list{ display:flex; flex-direction:column; gap:10px; overflow-y:auto; }
+  .tx-row{
+    display:flex; align-items:center; gap:12px;
+    padding:10px 0;
+    border-bottom:1px solid var(--hair);
+  }
+  .tx-icon{
+    width:34px;height:34px;border-radius:10px;
+    background:var(--panel-2);
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;
+  }
+  .tx-info{ flex:1; }
+  .tx-name{ font-size:13.5px; font-weight:600; }
+  .tx-sub{ font-size:11.5px; color:var(--muted); }
+  .tx-amt{ font-size:13.5px; font-weight:600; }
+  .tx-amt.neg{ color:var(--text); }
+  .tx-amt.pos{ color:var(--mint); }
+
+  /* ---- TRANSACTION ---- */
+  .tx-head{ margin-bottom:18px; }
+  .tx-head h2{
+    font-family:'Fraunces',serif; font-weight:500; font-size:21px; margin:0 0 4px;
+  }
+  .tx-head p{ color:var(--muted); font-size:13px; margin:0; }
+  .recipient-check{
+    background:rgba(74,222,155,0.08);
+    border:1px solid rgba(74,222,155,0.25);
+    border-radius:12px;
+    padding:12px 14px;
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:16px;
+  }
+  .recipient-check .tick{
+    width:22px;height:22px;border-radius:50%;
+    background:var(--mint); color:#0A1F16;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px; font-weight:800; flex-shrink:0;
+  }
+  .recipient-check .label{ font-size:11px; color:var(--mint); font-weight:700; margin-bottom:2px; }
+  .recipient-check .name{ font-size:13.5px; font-weight:600; }
+  .amount-block{
+    text-align:center;
+    padding:20px 0 24px;
+  }
+  .amount-block .cur{ font-size:16px; color:var(--muted); vertical-align:top; }
+  .amount-block .num{
+    font-family:'Fraunces',serif; font-size:44px; font-weight:500;
+  }
+  .fee-box{
+    background:var(--panel);
+    border:1px solid var(--hair);
+    border-radius:12px;
+    padding:12px 14px;
+    margin-bottom:16px;
+  }
+  .fee-row{
+    display:flex; justify-content:space-between;
+    font-size:12.5px; color:var(--muted);
+    padding:4px 0;
+  }
+  .fee-row.total{
+    color:var(--text); font-weight:700;
+    border-top:1px solid var(--hair);
+    margin-top:6px; padding-top:10px;
+  }
+  .secure-note{
+    display:flex; align-items:center; gap:8px;
+    font-size:11.5px; color:var(--muted);
+    margin-top:auto; margin-bottom:12px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="intro">
+    <div class="eyebrow">SwiftPay — Friction Fix Prototype</div>
+    <h1>Three screens designed to earn trust before they ask for money</h1>
+    <p>Login, Home, and Transaction — rebuilt around the moment international users hesitate and abandon.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="active" onclick="showScreen('login', this)">Login</button>
+    <button onclick="showScreen('home', this)">Home</button>
+    <button onclick="showScreen('transaction', this)">Transaction</button>
+  </div>
+
+  <div class="phone">
+    <div class="notch"></div>
+
+    <!-- LOGIN -->
+    <div class="screen active" id="login">
+      <div class="login-mark"><div class="dot"></div><span>SwiftPay</span></div>
+      <div class="login-head">
+        <h2>Welcome back</h2>
+        <p>Your money, verified at every step. Sign in to continue.</p>
+      </div>
+      <div class="field">
+        <label>Email or phone</label>
+        <input type="text" placeholder="you@example.com">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" placeholder="••••••••">
+      </div>
+      <button class="btn-primary">Sign in</button>
+      <button class="btn-ghost">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v6c0 5 3.4 9 8 10 4.6-1 8-5 8-10V6l-8-4z" stroke="#F4F1EA" stroke-width="1.6"/></svg>
+        Use Face ID
+      </button>
+      <div class="trust-strip">
+        <div class="trust-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v6c0 5 3.4 9 8 10 4.6-1 8-5 8-10V6l-8-4z" stroke="#C79A45" stroke-width="1.8"/></svg>
+          <span><b>Regulated</b> by the Financial Conduct Authority</span>
+        </div>
+        <div class="trust-row">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="10" rx="2" stroke="#C79A45" stroke-width="1.8"/><path d="M8 10V7a4 4 0 018 0v3" stroke="#C79A45" stroke-width="1.8"/></svg>
+          <span><b>256-bit encryption</b> on every transfer</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <div class="screen" id="home">
+      <div class="home-top">
+        <div>
+          <div class="greeting">Good afternoon</div>
+          <div class="name">Amara Chen</div>
+        </div>
+        <div class="avatar">AC</div>
+      </div>
+
+      <div class="balance-card">
+        <div class="balance-label">
+          Total balance
+          <span class="verified-pill">
+            <svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#C79A45" stroke-width="3"/></svg>
+            Verified account
+          </span>
+        </div>
+        <div class="balance-amount">$4,285.60</div>
+        <div class="balance-actions">
+          <div class="chip">Send</div>
+          <div class="chip">Add money</div>
+          <div class="chip">Convert</div>
+        </div>
+      </div>
+
+      <div class="section-label">Recent activity</div>
+      <div class="tx-list">
+        <div class="tx-row">
+          <div class="tx-icon">🛒</div>
+          <div class="tx-info"><div class="tx-name">Marché Bio</div><div class="tx-sub">Groceries · Today</div></div>
+          <div class="tx-amt neg">−€24.30</div>
+        </div>
+        <div class="tx-row">
+          <div class="tx-icon">💼</div>
+          <div class="tx-info"><div class="tx-name">Client payment</div><div class="tx-sub">Received · Yesterday</div></div>
+          <div class="tx-amt pos">+$620.00</div>
+        </div>
+        <div class="tx-row">
+          <div class="tx-icon">🏠</div>
+          <div class="tx-info"><div class="tx-name">Rent transfer</div><div class="tx-sub">To landlord · Mon</div></div>
+          <div class="tx-amt neg">−€850.00</div>
+        </div>
+        <div class="tx-row">
+          <div class="tx-icon">📱</div>
+          <div class="tx-info"><div class="tx-name">Mobile plan</div><div class="tx-sub">Subscription · Mon</div></div>
+          <div class="tx-amt neg">−€19.99</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSACTION -->
+    <div class="screen" id="transaction">
+      <div class="tx-head">
+        <h2>Send money</h2>
+        <p>Review the details before you confirm.</p>
+      </div>
+
+      <div class="recipient-check">
+        <div class="tick">✓</div>
+        <div>
+          <div class="label">Name matches account on file</div>
+          <div class="name">Julien Moreau</div>
+        </div>
+      </div>
+
+      <div class="amount-block">
+        <div><span class="cur">€</span><span class="num">850.00</span></div>
+      </div>
+
+      <div class="fee-box">
+        <div class="fee-row"><span>Transfer fee</span><span>€0.00</span></div>
+        <div class="fee-row"><span>Exchange rate</span><span>1 USD = 0.92 EUR</span></div>
+        <div class="fee-row total"><span>Total charged</span><span>$923.91</span></div>
+      </div>
+
+      <button class="btn-primary">Confirm with Face ID</button>
+
+      <div class="secure-note">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="10" rx="2" stroke="#8D97A3" stroke-width="1.6"/><path d="M8 10V7a4 4 0 018 0v3" stroke="#8D97A3" stroke-width="1.6"/></svg>
+        This transfer is protected and can be tracked in real time
+      </div>
+    </div>
+
+  </div>
+
+<script>
+  function showScreen(id, btn){
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
